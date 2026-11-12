@@ -131,23 +131,6 @@ ClarifySQL/
   tests/                  offline tests with a fake LLM (no API key needed)
 ```
 
-### How it maps to your abstract
-| Abstract says | Where it is |
-|---|---|
-| Score ambiguity, ask only if high | `ambiguity.py`, threshold slider in the app |
-| Retrieve relevant tables/columns (RAG) | `retrieval.py` (Gemini embeddings + numpy cosine search; local fallback) |
-| Validate syntax, schema consistency, filter values | `validator.py` |
-| Bounded repair loop returning diagnostics to the LLM | `pipeline.py` (max 2 repairs, diagnostics from `validator.py`) |
-| Plain-language explanation | `explain.py` |
-| Trust from repairs, agreement, suspicious results, retrieval confidence | `trust.py` (weights 0.25 / 0.35 / 0.20 / 0.20) |
-| Baseline + ablations, execution accuracy, does the badge separate right from wrong | `evaluate.py` |
-
-### Things worth knowing (and saying honestly in your report)
-- The trust weights (0.35 agreement, 0.25 repairs, 0.20 result sanity, 0.20 retrieval) and the High/Medium cut-offs (0.80 / 0.55) are **design choices, not learned values**. `evaluate.py` measures whether they work; you may tune them in `trust.py` / `config.py` and report that.
-- The retrieval-confidence scaling in `retrieval.py` (`CONF_RANGE`) is heuristic and depends on the embedding model.
-- The test set has 62 cases on one database: good for a project, too small for strong statistical claims. Report numbers as indicative, and run `evaluate.py` more than once if you want to show variation.
-- Your abstract mentions Spider/BIRD. This code evaluates on your ecommerce database. Adding a Spider/BIRD subset needs a small loader that gives each database to `Database(path)` and its questions to `ClarifySQL.ask`; the pipeline itself is database-agnostic.
-- Gemini model names change. Defaults are `gemini-3.5-flash` (chat) and `gemini-embedding-2` (embeddings), with fallbacks. Google retired `gemini-2.5-flash` in October 2026. If a model is retired, change `GEMINI_MODELS` / `GEMINI_EMBED_MODELS` in `.env`. Gemini 3.x models work best with default sampling settings, so the code does not set temperature.
 
 ---
 
