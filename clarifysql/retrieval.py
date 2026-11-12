@@ -1,7 +1,7 @@
 """Schema retrieval (the 'R' in RAG): embed tables/columns, retrieve only what the question needs.
 
-Vectors come from the Gemini embedding API. A local hashed bag-of-words embedder is always
-available as a fallback, so retrieval keeps working when the API is down or out of quota.
+Vectors come from the LLM provider's embedding API when it has one (Groq does not), otherwise from a local
+hashed bag-of-words embedder, which is always available as a fallback.
 """
 from __future__ import annotations
 
@@ -119,8 +119,8 @@ class SchemaIndex:
         return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
     def _load_or_build_api_vecs(self):
-        if self.llm is None:
-            return
+        if self.llm is None or not getattr(self.llm, "supports_embeddings", True):
+            return                      # e.g. Groq: no embedding API, use the local embedder only
         fp = self._fingerprint()
         vec_file = self.cache_dir / f"schema_vecs_{fp}.npy"
         meta_file = self.cache_dir / f"schema_vecs_{fp}.json"
