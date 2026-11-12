@@ -1,0 +1,356 @@
+[
+  {
+    "id": "C01",
+    "type": "clear",
+    "question": "How many customers are there?",
+    "mode": "baseline",
+    "correct": true,
+    "status": "answer",
+    "sql": "SELECT COUNT(*) FROM customers;",
+    "message": "",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 1,
+    "rows_preview": [
+      [
+        "200"
+      ]
+    ],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 4.36,
+    "asked": false
+  },
+  {
+    "id": "C02",
+    "type": "clear",
+    "question": "How many orders were cancelled?",
+    "mode": "baseline",
+    "correct": true,
+    "status": "answer",
+    "sql": "SELECT COUNT(*) FROM orders WHERE status = 'cancelled';",
+    "message": "",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 1,
+    "rows_preview": [
+      [
+        "150"
+      ]
+    ],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 2.85,
+    "asked": false
+  },
+  {
+    "id": "C03",
+    "type": "clear",
+    "question": "List all product names in the Electronics category.",
+    "mode": "baseline",
+    "correct": true,
+    "status": "answer",
+    "sql": "SELECT p.product_name \nFROM products p \nJOIN categories c ON p.category_id = c.category_id \nWHERE c.category_name = 'Electronics';",
+    "message": "",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 8,
+    "rows_preview": [
+      [
+        "Wireless Earbuds"
+      ],
+      [
+        "Smart Watch"
+      ],
+      [
+        "Bluetooth Speaker"
+      ],
+      [
+        "Power Bank 20000mAh"
+      ],
+      [
+        "Gaming Mouse"
+      ]
+    ],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 3.46,
+    "asked": false
+  },
+  {
+    "id": "V01",
+    "type": "vague",
+    "question": "Show me the best products.",
+    "mode": "baseline",
+    "correct": false,
+    "status": "unanswerable",
+    "sql": null,
+    "message": "The criteria for \"best products\" (e.g., highest ratings, sales volume, or revenue) is not defined in the schema.",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 0,
+    "rows_preview": [],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 18.18,
+    "asked": false,
+    "interpretation": "(any)"
+  },
+  {
+    "id": "V02",
+    "type": "vague",
+    "question": "Who are our top customers?",
+    "mode": "baseline",
+    "correct": false,
+    "status": "answer",
+    "sql": "SELECT c.customer_id, c.full_name, SUM(oi.quantity * oi.unit_price) AS total_spent\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id\nJOIN order_items oi ON o.order_id = oi.order_id\nGROUP BY c.customer_id, c.full_name\nORDER BY total_spent DESC\nLIMIT 10;",
+    "message": "",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 10,
+    "rows_preview": [
+      [
+        "46",
+        "Suresh Sharma",
+        "451589.0"
+      ],
+      [
+        "80",
+        "Karthik Singh",
+        "390282.0"
+      ],
+      [
+        "147",
+        "Suresh Patel",
+        "282106.0"
+      ],
+      [
+        "87",
+        "Arjun Reddy",
+        "269385.0"
+      ],
+      [
+        "73",
+        "Sirisha Patel",
+        "258917.0"
+      ]
+    ],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 12.5,
+    "asked": false,
+    "interpretation": "(any)"
+  },
+  {
+    "id": "V03",
+    "type": "vague",
+    "question": "Show recent orders.",
+    "mode": "baseline",
+    "correct": false,
+    "status": "answer",
+    "sql": "SELECT *\nFROM orders\nWHERE order_date >= date((SELECT MAX(order_date) FROM orders), '-30 days')\nORDER BY order_date DESC;",
+    "message": "",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 118,
+    "rows_preview": [
+      [
+        "165",
+        "20",
+        "2024-12-31",
+        "delivered",
+        "Debit Card"
+      ],
+      [
+        "568",
+        "41",
+        "2024-12-31",
+        "shipped",
+        "Credit Card"
+      ],
+      [
+        "1073",
+        "101",
+        "2024-12-31",
+        "delivered",
+        "Debit Card"
+      ],
+      [
+        "111",
+        "95",
+        "2024-12-30",
+        "cancelled",
+        "Net Banking"
+      ],
+      [
+        "604",
+        "53",
+        "2024-12-30",
+        "delivered",
+        "Cash on Delivery"
+      ]
+    ],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 10.99,
+    "asked": false,
+    "interpretation": "(any)"
+  },
+  {
+    "id": "T01",
+    "type": "tricky",
+    "question": "How many orders were completed?",
+    "mode": "baseline",
+    "correct": true,
+    "status": "answer",
+    "sql": "SELECT COUNT(*) FROM orders WHERE status = 'delivered';",
+    "message": "",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 1,
+    "rows_preview": [
+      [
+        "888"
+      ]
+    ],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 4.94,
+    "asked": false
+  },
+  {
+    "id": "T02",
+    "type": "tricky",
+    "question": "List customers from Bangalore.",
+    "mode": "baseline",
+    "correct": true,
+    "status": "answer",
+    "sql": "SELECT * FROM customers WHERE city = 'Bengaluru';",
+    "message": "",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 23,
+    "rows_preview": [
+      [
+        "17",
+        "Lakshmi Rao",
+        "lakshmi.rao17@example.com",
+        "Bengaluru",
+        "Karnataka",
+        "2023-08-08"
+      ],
+      [
+        "19",
+        "Karthik Reddy",
+        "karthik.reddy19@example.com",
+        "Bengaluru",
+        "Karnataka",
+        "2024-01-15"
+      ],
+      [
+        "31",
+        "Lakshmi Patel",
+        "lakshmi.patel31@example.com",
+        "Bengaluru",
+        "Karnataka",
+        "2024-07-09"
+      ],
+      [
+        "36",
+        "Rohan Gupta",
+        "rohan.gupta36@example.com",
+        "Bengaluru",
+        "Karnataka",
+        "2023-12-09"
+      ],
+      [
+        "37",
+        "Sirisha Varma",
+        "sirisha.varma37@example.com",
+        "Bengaluru",
+        "Karnataka",
+        "2023-11-24"
+      ]
+    ],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 4.04,
+    "asked": false
+  },
+  {
+    "id": "T03",
+    "type": "tricky",
+    "question": "How many orders were paid by cash?",
+    "mode": "baseline",
+    "correct": true,
+    "status": "answer",
+    "sql": "SELECT COUNT(*) FROM orders WHERE payment_method = 'Cash on Delivery';",
+    "message": "",
+    "repairs": 0,
+    "validated": false,
+    "agreement": null,
+    "n_rows": 1,
+    "rows_preview": [
+      [
+        "203"
+      ]
+    ],
+    "ambiguity": null,
+    "retrieval_tables": null,
+    "retrieval_confidence": null,
+    "retrieval_expanded": false,
+    "trust_level": null,
+    "trust_score": null,
+    "llm_calls": 1,
+    "seconds": 3.93,
+    "asked": false
+  }
+]

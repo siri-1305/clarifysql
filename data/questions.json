@@ -1,0 +1,504 @@
+[
+  {
+    "id": "C01",
+    "type": "clear",
+    "question": "How many customers are there?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM customers;"
+  },
+  {
+    "id": "C02",
+    "type": "clear",
+    "question": "How many orders were cancelled?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM orders WHERE status = 'cancelled';"
+  },
+  {
+    "id": "C03",
+    "type": "clear",
+    "question": "List all product names in the Electronics category.",
+    "should_ask": false,
+    "expected_sql": "SELECT p.product_name FROM products p JOIN categories c ON p.category_id = c.category_id WHERE c.category_name = 'Electronics';"
+  },
+  {
+    "id": "C04",
+    "type": "clear",
+    "question": "What is the price of the Wireless Earbuds?",
+    "should_ask": false,
+    "expected_sql": "SELECT price FROM products WHERE product_name = 'Wireless Earbuds';"
+  },
+  {
+    "id": "C05",
+    "type": "clear",
+    "question": "How many orders were placed in 2024?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM orders WHERE order_date >= '2024-01-01' AND order_date < '2025-01-01';"
+  },
+  {
+    "id": "C06",
+    "type": "clear",
+    "question": "How many customers are from Hyderabad?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM customers WHERE city = 'Hyderabad';"
+  },
+  {
+    "id": "C07",
+    "type": "clear",
+    "question": "Show the 5 most expensive products.",
+    "should_ask": false,
+    "expected_sql": "SELECT product_name, price FROM products ORDER BY price DESC LIMIT 5;"
+  },
+  {
+    "id": "C08",
+    "type": "clear",
+    "question": "What is the average rating of the Wireless Earbuds?",
+    "should_ask": false,
+    "expected_sql": "SELECT AVG(r.rating) FROM reviews r JOIN products p ON p.product_id = r.product_id WHERE p.product_name = 'Wireless Earbuds';"
+  },
+  {
+    "id": "C09",
+    "type": "clear",
+    "question": "How many products are out of stock?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM products WHERE stock_qty = 0;"
+  },
+  {
+    "id": "C10",
+    "type": "clear",
+    "question": "What is the total quantity sold of the Yoga Mat?",
+    "should_ask": false,
+    "expected_sql": "SELECT SUM(oi.quantity) FROM order_items oi JOIN products p ON p.product_id = oi.product_id WHERE p.product_name = 'Yoga Mat';"
+  },
+  {
+    "id": "C11",
+    "type": "clear",
+    "question": "How many customers signed up in 2023?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM customers WHERE signup_date >= '2023-01-01' AND signup_date < '2024-01-01';"
+  },
+  {
+    "id": "C12",
+    "type": "clear",
+    "question": "How many orders were paid by UPI?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM orders WHERE payment_method = 'UPI';"
+  },
+  {
+    "id": "C13",
+    "type": "clear",
+    "question": "Which category has the most products?",
+    "should_ask": false,
+    "expected_sql": "SELECT c.category_name FROM categories c JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id ORDER BY COUNT(*) DESC LIMIT 1;"
+  },
+  {
+    "id": "C14",
+    "type": "clear",
+    "question": "What is the total revenue from delivered orders in 2024?",
+    "should_ask": false,
+    "expected_sql": "SELECT SUM(oi.quantity * oi.unit_price) FROM order_items oi JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'delivered' AND o.order_date >= '2024-01-01';"
+  },
+  {
+    "id": "C15",
+    "type": "clear",
+    "question": "How many reviews have a rating of 5?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM reviews WHERE rating = 5;"
+  },
+  {
+    "id": "C16",
+    "type": "clear",
+    "question": "How many customers from Visakhapatnam placed more than 3 orders?",
+    "should_ask": false,
+    "expected_sql": "SELECT COUNT(*) FROM (SELECT c.customer_id FROM customers c JOIN orders o ON o.customer_id = c.customer_id WHERE c.city = 'Visakhapatnam' GROUP BY c.customer_id HAVING COUNT(*) > 3);"
+  },
+  {
+    "id": "C17",
+    "type": "clear",
+    "question": "What is the average order value for delivered orders?",
+    "should_ask": false,
+    "expected_sql": "SELECT AVG(t) FROM (SELECT SUM(oi.quantity * oi.unit_price) AS t FROM order_items oi JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'delivered' GROUP BY o.order_id);"
+  },
+  {
+    "id": "C18",
+    "type": "clear",
+    "question": "List the products launched after 2024-01-01.",
+    "should_ask": false,
+    "expected_sql": "SELECT product_name FROM products WHERE launch_date > '2024-01-01';"
+  },
+  {
+    "id": "V01",
+    "type": "vague",
+    "question": "Show me the best products.",
+    "should_ask": true,
+    "clarifying_question": "Best by what?",
+    "interpretations": [
+      {
+        "label": "highest sales (units sold)",
+        "expected_sql": "SELECT p.product_name, SUM(oi.quantity) AS score FROM products p JOIN order_items oi ON oi.product_id = p.product_id  GROUP BY p.product_name ORDER BY score DESC LIMIT 5;"
+      },
+      {
+        "label": "highest average rating",
+        "expected_sql": "SELECT p.product_name, AVG(r.rating) AS score FROM products p JOIN reviews r ON r.product_id = p.product_id  GROUP BY p.product_name ORDER BY score DESC LIMIT 5;"
+      },
+      {
+        "label": "highest profit",
+        "expected_sql": "SELECT p.product_name, SUM(oi.quantity * (oi.unit_price - p.cost)) AS score FROM products p JOIN order_items oi ON oi.product_id = p.product_id  GROUP BY p.product_name ORDER BY score DESC LIMIT 5;"
+      }
+    ]
+  },
+  {
+    "id": "V02",
+    "type": "vague",
+    "question": "Who are our top customers?",
+    "should_ask": true,
+    "clarifying_question": "Top by what?",
+    "interpretations": [
+      {
+        "label": "total spend",
+        "expected_sql": "SELECT c.full_name, SUM(oi.quantity * oi.unit_price) AS score FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id  GROUP BY c.full_name ORDER BY score DESC LIMIT 5;"
+      },
+      {
+        "label": "number of orders",
+        "expected_sql": "SELECT c.full_name, COUNT(DISTINCT o.order_id) AS score FROM customers c JOIN orders o ON o.customer_id = c.customer_id  GROUP BY c.full_name ORDER BY score DESC LIMIT 5;"
+      }
+    ]
+  },
+  {
+    "id": "V03",
+    "type": "vague",
+    "question": "Show recent orders.",
+    "should_ask": true,
+    "clarifying_question": "How recent?",
+    "interpretations": [
+      {
+        "label": "the 10 latest orders",
+        "expected_sql": "SELECT * FROM orders ORDER BY order_date DESC LIMIT 10;"
+      },
+      {
+        "label": "orders in the last 30 days of data",
+        "expected_sql": "SELECT * FROM orders WHERE order_date >= '2024-12-02';"
+      }
+    ]
+  },
+  {
+    "id": "V04",
+    "type": "vague",
+    "question": "Which products are popular?",
+    "should_ask": true,
+    "clarifying_question": "Popular in what sense?",
+    "interpretations": [
+      {
+        "label": "most units sold",
+        "expected_sql": "SELECT p.product_name, SUM(oi.quantity) AS score FROM products p JOIN order_items oi ON oi.product_id = p.product_id  GROUP BY p.product_name ORDER BY score DESC LIMIT 5;"
+      },
+      {
+        "label": "appear in the most orders",
+        "expected_sql": "SELECT p.product_name, COUNT(DISTINCT oi.order_id) AS score FROM products p JOIN order_items oi ON oi.product_id = p.product_id  GROUP BY p.product_name ORDER BY score DESC LIMIT 5;"
+      }
+    ]
+  },
+  {
+    "id": "V05",
+    "type": "vague",
+    "question": "Show sales by region.",
+    "should_ask": true,
+    "clarifying_question": "Which region level?",
+    "interpretations": [
+      {
+        "label": "by city",
+        "expected_sql": "SELECT c.city, SUM(oi.quantity * oi.unit_price) FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id GROUP BY c.city;"
+      },
+      {
+        "label": "by state",
+        "expected_sql": "SELECT c.state, SUM(oi.quantity * oi.unit_price) FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id GROUP BY c.state;"
+      }
+    ]
+  },
+  {
+    "id": "V06",
+    "type": "vague",
+    "question": "What is our revenue?",
+    "should_ask": true,
+    "clarifying_question": "Which orders count?",
+    "interpretations": [
+      {
+        "label": "all orders",
+        "expected_sql": "SELECT SUM(oi.quantity * oi.unit_price) FROM order_items oi;"
+      },
+      {
+        "label": "delivered orders only",
+        "expected_sql": "SELECT SUM(oi.quantity * oi.unit_price) FROM order_items oi JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'delivered';"
+      }
+    ]
+  },
+  {
+    "id": "V07",
+    "type": "vague",
+    "question": "List expensive products.",
+    "should_ask": true,
+    "clarifying_question": "How expensive?",
+    "interpretations": [
+      {
+        "label": "the 5 highest-priced",
+        "expected_sql": "SELECT product_name, price FROM products ORDER BY price DESC LIMIT 5;"
+      },
+      {
+        "label": "priced above the average price",
+        "expected_sql": "SELECT product_name, price FROM products WHERE price > (SELECT AVG(price) FROM products);"
+      }
+    ]
+  },
+  {
+    "id": "V08",
+    "type": "vague",
+    "question": "Which category performs best?",
+    "should_ask": true,
+    "clarifying_question": "Best by what?",
+    "interpretations": [
+      {
+        "label": "revenue",
+        "expected_sql": "SELECT c.category_name, SUM(oi.quantity * oi.unit_price) AS score FROM categories c JOIN products p ON p.category_id = c.category_id JOIN order_items oi ON oi.product_id = p.product_id  GROUP BY c.category_name ORDER BY score DESC LIMIT 1;"
+      },
+      {
+        "label": "average rating",
+        "expected_sql": "SELECT c.category_name, AVG(r.rating) AS score FROM categories c JOIN products p ON p.category_id = c.category_id JOIN reviews r ON r.product_id = p.product_id  GROUP BY c.category_name ORDER BY score DESC LIMIT 1;"
+      }
+    ]
+  },
+  {
+    "id": "V09",
+    "type": "vague",
+    "question": "Show active customers.",
+    "should_ask": true,
+    "clarifying_question": "Active how?",
+    "interpretations": [
+      {
+        "label": "ordered in 2024",
+        "expected_sql": "SELECT DISTINCT c.full_name FROM customers c JOIN orders o ON o.customer_id = c.customer_id WHERE o.order_date >= '2024-01-01';"
+      },
+      {
+        "label": "ordered in the last 6 months of data",
+        "expected_sql": "SELECT DISTINCT c.full_name FROM customers c JOIN orders o ON o.customer_id = c.customer_id WHERE o.order_date >= '2024-07-01';"
+      }
+    ]
+  },
+  {
+    "id": "V10",
+    "type": "vague",
+    "question": "Find low stock products.",
+    "should_ask": true,
+    "clarifying_question": "What counts as low?",
+    "interpretations": [
+      {
+        "label": "stock below 10",
+        "expected_sql": "SELECT product_name, stock_qty FROM products WHERE stock_qty < 10;"
+      },
+      {
+        "label": "stock below 20",
+        "expected_sql": "SELECT product_name, stock_qty FROM products WHERE stock_qty < 20;"
+      }
+    ]
+  },
+  {
+    "id": "V11",
+    "type": "vague",
+    "question": "Show good reviews.",
+    "should_ask": true,
+    "clarifying_question": "What counts as good?",
+    "interpretations": [
+      {
+        "label": "rating 4 or 5",
+        "expected_sql": "SELECT * FROM reviews WHERE rating >= 4;"
+      },
+      {
+        "label": "rating 5 only",
+        "expected_sql": "SELECT * FROM reviews WHERE rating = 5;"
+      }
+    ]
+  },
+  {
+    "id": "V12",
+    "type": "vague",
+    "question": "How are sales this year?",
+    "should_ask": true,
+    "clarifying_question": "Total or monthly?",
+    "interpretations": [
+      {
+        "label": "total 2024 revenue",
+        "expected_sql": "SELECT SUM(oi.quantity * oi.unit_price) FROM order_items oi JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'delivered' AND o.order_date >= '2024-01-01';"
+      },
+      {
+        "label": "month-wise 2024 revenue",
+        "expected_sql": "SELECT substr(o.order_date,1,7) AS month, SUM(oi.quantity * oi.unit_price) FROM order_items oi JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'delivered' AND o.order_date >= '2024-01-01' GROUP BY month ORDER BY month;"
+      }
+    ]
+  },
+  {
+    "id": "V13",
+    "type": "vague",
+    "question": "Who bought the most?",
+    "should_ask": true,
+    "clarifying_question": "Most by what?",
+    "interpretations": [
+      {
+        "label": "quantity of items",
+        "expected_sql": "SELECT c.full_name, SUM(oi.quantity) AS score FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id  GROUP BY c.full_name ORDER BY score DESC LIMIT 1;"
+      },
+      {
+        "label": "total spend",
+        "expected_sql": "SELECT c.full_name, SUM(oi.quantity * oi.unit_price) AS score FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN order_items oi ON oi.order_id = o.order_id  GROUP BY c.full_name ORDER BY score DESC LIMIT 1;"
+      }
+    ]
+  },
+  {
+    "id": "V14",
+    "type": "vague",
+    "question": "Which is the best selling month?",
+    "should_ask": true,
+    "clarifying_question": "Best by what?",
+    "interpretations": [
+      {
+        "label": "revenue",
+        "expected_sql": "SELECT substr(o.order_date,1,7), SUM(oi.quantity * oi.unit_price) AS score FROM orders o JOIN order_items oi ON oi.order_id = o.order_id  GROUP BY substr(o.order_date,1,7) ORDER BY score DESC LIMIT 1;"
+      },
+      {
+        "label": "number of orders",
+        "expected_sql": "SELECT substr(o.order_date,1,7), COUNT(*) AS score FROM orders o  GROUP BY substr(o.order_date,1,7) ORDER BY score DESC LIMIT 1;"
+      }
+    ]
+  },
+  {
+    "id": "V15",
+    "type": "vague",
+    "question": "Which customers are inactive?",
+    "should_ask": true,
+    "clarifying_question": "Inactive how?",
+    "interpretations": [
+      {
+        "label": "never placed an order",
+        "expected_sql": "SELECT full_name FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders);"
+      },
+      {
+        "label": "no order in 2024",
+        "expected_sql": "SELECT full_name FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders WHERE order_date >= '2024-01-01');"
+      }
+    ]
+  },
+  {
+    "id": "T01",
+    "type": "tricky",
+    "question": "How many orders were completed?",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT COUNT(*) FROM orders WHERE status = 'delivered';",
+    "note": "'completed' is stored as 'delivered'"
+  },
+  {
+    "id": "T02",
+    "type": "tricky",
+    "question": "List customers from Bangalore.",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT full_name FROM customers WHERE city = 'Bengaluru';",
+    "note": "city stored as 'Bengaluru'"
+  },
+  {
+    "id": "T03",
+    "type": "tricky",
+    "question": "How many orders were paid by cash?",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT COUNT(*) FROM orders WHERE payment_method = 'Cash on Delivery';",
+    "note": "value is 'Cash on Delivery'"
+  },
+  {
+    "id": "T04",
+    "type": "tricky",
+    "question": "Show orders that were refunded.",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT * FROM orders WHERE status = 'returned';",
+    "note": "'refunded' maps to status 'returned'"
+  },
+  {
+    "id": "T05",
+    "type": "tricky",
+    "question": "What is the total amount of order 10?",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT SUM(quantity * unit_price) FROM order_items WHERE order_id = 10;",
+    "note": "no amount column; compute from items"
+  },
+  {
+    "id": "T06",
+    "type": "tricky",
+    "question": "Show products in the Electronic category.",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT p.product_name FROM products p JOIN categories c ON p.category_id = c.category_id WHERE c.category_name = 'Electronics';",
+    "note": "'Electronic' vs 'Electronics'"
+  },
+  {
+    "id": "T07",
+    "type": "tricky",
+    "question": "How many users signed up in 2023?",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT COUNT(*) FROM customers WHERE signup_date >= '2023-01-01' AND signup_date < '2024-01-01';",
+    "note": "'users' means customers table"
+  },
+  {
+    "id": "T08",
+    "type": "tricky",
+    "question": "What is the total quantity of items ordered by customers in Hyderabad?",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT SUM(oi.quantity) FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE c.city = 'Hyderabad';",
+    "note": "three-table join"
+  },
+  {
+    "id": "T09",
+    "type": "tricky",
+    "question": "List item names with price above 5000.",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT product_name FROM products WHERE price > 5000;",
+    "note": "'item' means product"
+  },
+  {
+    "id": "T10",
+    "type": "tricky",
+    "question": "How many orders were made with a debit card?",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT COUNT(*) FROM orders WHERE payment_method = 'Debit Card';",
+    "note": "value is 'Debit Card'"
+  },
+  {
+    "id": "T11",
+    "type": "tricky",
+    "question": "Show the product with the highest margin.",
+    "should_ask": false,
+    "answerable": true,
+    "expected_sql": "SELECT product_name, price - cost AS margin FROM products ORDER BY margin DESC LIMIT 1;",
+    "note": "no margin column; compute price - cost"
+  },
+  {
+    "id": "T12",
+    "type": "tricky",
+    "question": "Show customer phone numbers.",
+    "should_ask": false,
+    "answerable": false,
+    "expected_sql": null,
+    "note": "UNANSWERABLE: no phone column"
+  },
+  {
+    "id": "T13",
+    "type": "tricky",
+    "question": "Show employee salaries.",
+    "should_ask": false,
+    "answerable": false,
+    "expected_sql": null,
+    "note": "UNANSWERABLE: no employee data"
+  }
+]

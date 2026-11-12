@@ -1,0 +1,11 @@
+{
+  "baseline": {
+    "cases": 9,
+    "accuracy": 0.6666666666666666,
+    "acc_clear": 1.0,
+    "acc_tricky": 1.0,
+    "acc_vague": 0.0,
+    "avg_llm_calls": 1.0,
+    "avg_seconds": 7.25
+  }
+}
