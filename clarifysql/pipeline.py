@@ -13,7 +13,7 @@ from .config import PipelineOptions, Settings
 from .db import Database, SQLExecError, canonical_sql
 from .explain import Explanation, explain
 from .generator import baseline_sql, generate_sql, repair_sql
-from .llm import BaseLLM, GeminiLLM, LLMError
+from .llm import BaseLLM, GroqLLM, LLMError
 from .metrics import results_match
 from .retrieval import RetrievalResult, SchemaIndex
 from .trust import TrustResult, TrustSignals, compute_trust
@@ -79,7 +79,7 @@ class ClarifySQL:
     @classmethod
     def from_settings(cls, settings: Settings, options: Optional[PipelineOptions] = None) -> "ClarifySQL":
         db = Database(settings.db_path)
-        llm = GeminiLLM(settings)
+        llm = GroqLLM(settings)
         index = SchemaIndex(db, llm, settings.cache_dir)
         return cls(db, llm, index, options)
 
