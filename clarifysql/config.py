@@ -37,12 +37,15 @@ class Settings:
     cache_dir: Path = ROOT / ".cache"
     results_dir: Path = ROOT / "results"
 
-    api_key: str = field(default_factory=lambda: (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "").strip())
-    chat_models: List[str] = field(default_factory=lambda: _csv("GEMINI_MODELS", "gemini-3.5-flash,gemini-3.1-flash-lite"))
-    embed_models: List[str] = field(default_factory=lambda: _csv("GEMINI_EMBED_MODELS", "gemini-embedding-2,gemini-embedding-001"))
-    thinking_level: Optional[str] = field(default_factory=lambda: os.getenv("GEMINI_THINKING_LEVEL", "").strip() or None)
+    api_key: str = field(default_factory=lambda: (os.getenv("GROQ_API_KEY") or "").strip())
+    # Tried in order. If one is retired or hits its daily limit, the next is used (limits are per model).
+    chat_models: List[str] = field(default_factory=lambda: _csv("GROQ_MODELS", "openai/gpt-oss-120b,openai/gpt-oss-20b"))
+    reasoning_effort: str = field(default_factory=lambda: os.getenv("GROQ_REASONING_EFFORT", "").strip().lower())
     temperature: Optional[float] = field(default_factory=lambda: _opt_float("LLM_TEMPERATURE"))
-    min_interval: float = field(default_factory=lambda: float(os.getenv("LLM_MIN_INTERVAL", "1.0")))
+    max_output_tokens: int = field(default_factory=lambda: int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "2048")))
+    # Free-tier pacing (30 requests/min and ~8K tokens/min on the models above). Set LLM_TPM=0 to disable token pacing.
+    min_interval: float = field(default_factory=lambda: float(os.getenv("LLM_MIN_INTERVAL", "2.2")))
+    tokens_per_minute: int = field(default_factory=lambda: int(os.getenv("LLM_TPM", "7000")))
     max_retries: int = field(default_factory=lambda: int(os.getenv("LLM_MAX_RETRIES", "6")))
     use_cache: bool = field(default_factory=lambda: os.getenv("LLM_CACHE", "1") != "0")
 
