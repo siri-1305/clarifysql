@@ -30,7 +30,7 @@ from typing import Any, Dict, List
 
 from clarifysql.config import PipelineOptions, Settings
 from clarifysql.db import Database, SQLExecError
-from clarifysql.llm import GeminiLLM, LLMError
+from clarifysql.llm import GroqLLM, LLMError
 from clarifysql.metrics import auroc, results_match
 from clarifysql.pipeline import ClarifySQL
 from clarifysql.retrieval import SchemaIndex
@@ -172,7 +172,7 @@ def main():
     settings = Settings()
     try:
         db = Database(settings.db_path)
-        llm = GeminiLLM(settings)
+        llm = GroqLLM(settings)
         index = SchemaIndex(db, llm, settings.cache_dir)
     except (LLMError, FileNotFoundError) as e:
         sys.exit(f"Cannot start: {e}")
