@@ -7,7 +7,7 @@ import streamlit as st
 
 from clarifysql.config import PipelineOptions, Settings
 from clarifysql.db import Database
-from clarifysql.llm import GeminiLLM, LLMError
+from clarifysql.llm import GroqLLM, LLMError
 from clarifysql.pipeline import ClarifySQL, PipelineResult
 from clarifysql.retrieval import SchemaIndex
 from clarifysql.validator import HAS_SQLGLOT
@@ -22,7 +22,7 @@ BADGE_COLORS = {"High": "#1a7f37", "Medium": "#b7791f", "Low": "#c0392b"}
 def load_backend():
     settings = Settings()
     db = Database(settings.db_path)
-    llm = GeminiLLM(settings)
+    llm = GroqLLM(settings)
     index = SchemaIndex(db, llm, settings.cache_dir)
     return settings, db, llm, index
 
@@ -33,7 +33,7 @@ except (LLMError, FileNotFoundError) as e:
     st.title("🔎 ClarifySQL")
     st.error(f"Could not start: {e}")
     st.markdown("**Fix:** open the file named `.env` in the project folder, put your key on the line "
-                "`GEMINI_API_KEY=...`, save, and restart with `streamlit run app.py`.")
+                "`GROQ_API_KEY=...`, save, and restart with `streamlit run app.py`.")
     st.stop()
 
 
