@@ -8,7 +8,7 @@ then **explains in plain English** how it understood the question and shows a **
 
 ```
 Question -> Ambiguity check -> Schema retrieval (RAG) -> SQL generation -> Validate & repair -> Explanation + Trust badge
-              (ask only if       (embeddings +            (Gemini)        (sqlglot + SQLite,     (plain English,
+              (ask only if       (embeddings +            (Groq)          (sqlglot + SQLite,     (plain English,
                score >= 0.5)      vector search)                           max 2 repairs)         badge from 4 signals)
 ```
 
@@ -45,16 +45,16 @@ Your prompt now starts with `(venv)`. (If PowerShell blocks activation, run `Set
 ```
 pip install -r requirements.txt
 ```
-This installs streamlit, google-genai, sqlglot, numpy, pandas, python-dotenv. Needs internet, takes 1-3 minutes.
+This installs streamlit, groq, sqlglot, numpy, pandas, python-dotenv. Needs internet, takes 1-3 minutes.
 
-### Step 5 - Get a free Gemini API key and put it in `.env`
-1. Open https://aistudio.google.com/apikey , sign in with a Google account, click **Create API key**, copy it.
+### Step 5 - Get a free Groq API key and put it in `.env`
+1. Open https://console.groq.com/keys , sign in, click **Create API Key**, copy it.
 2. Make your settings file by copying the example:
    - Windows: `copy .env.example .env`
    - Mac/Linux: `cp .env.example .env`
 3. Open `.env` in a text editor and replace `PASTE_YOUR_KEY_HERE` with your key. No quotes, no spaces:
    ```
-   GEMINI_API_KEY=AIza...yourkey...
+   GROQ_API_KEY=gsk_...yourkey...
    ```
 4. Save. **Never share or upload this file** (it is already in `.gitignore`).
 
@@ -63,7 +63,7 @@ This installs streamlit, google-genai, sqlglot, numpy, pandas, python-dotenv. Ne
 python selfcheck.py --online
 ```
 It checks the packages, the database, that the validator accepts all 60 reference queries, that it catches mistakes, runs 14 offline tests,
-and (with `--online`) calls Gemini once. You want to see **ALL CHECKS PASSED**.
+and (with `--online`) calls Groq once. You want to see **ALL CHECKS PASSED**.
 If a line says FAIL, read the troubleshooting table at the bottom.
 
 ### Step 7 - Start the app
@@ -118,7 +118,7 @@ ClarifySQL/
   data/                   ecommerce.db, questions.json (62 labelled cases), make_dataset.py   <- your files
   clarifysql/             backend
     config.py             settings + pipeline switches (ablation flags)
-    llm.py                Gemini client: retries, rate limiting, model fallback, disk cache, embeddings
+    llm.py                Groq client: retries, token-aware rate limiting, model fallback, disk cache
     db.py                 read-only SQLite access, schema + value profiling
     ambiguity.py          ambiguity score = 0.8 x LLM judgement + 0.2 x vague-word cue; threshold 0.5
     retrieval.py          schema RAG: embed tables/columns, vector search, value grounding, FK bridging
@@ -132,6 +132,7 @@ ClarifySQL/
 ```
 
 
+
 ---
 
 ## Troubleshooting
@@ -140,10 +141,10 @@ ClarifySQL/
 |---|---|
 | `python` not recognized | Reinstall Python with "Add to PATH", or use `py` / `python3`. |
 | `pip install` fails | Check internet; run `python -m pip install --upgrade pip` and retry. |
-| App says "No API key found" | `.env` must exist (not `.env.example`) and the line must be `GEMINI_API_KEY=yourkey`. Restart the app after editing. |
-| "API key was rejected" | Create a new key at aistudio.google.com/apikey and paste it again. |
-| "Model ... is not available" | Put a current model name first in `GEMINI_MODELS` in `.env` (see ai.google.dev/gemini-api/docs/models). |
-| Many `429` / slow answers | Free-tier limit. Wait, or add `LLM_MIN_INTERVAL=6` to `.env`, or use fewer agreement samples (sidebar slider). |
+| App says "No API key found" | `.env` must exist and the line must be `GROQ_API_KEY=yourkey`. Restart the app after editing. |
+| "API key was rejected" | Create a new key at console.groq.com/keys and paste it again. |
+| "Model ... is not available" | Put a current model name first in `GROQ_MODELS` in `.env` (see console.groq.com/docs/models). |
+| Many `429` / slow answers | Free-tier limit. Wait, add `LLM_MIN_INTERVAL=4` to `.env`, or use fewer agreement samples (sidebar slider). Daily limit: add a second model to `GROQ_MODELS`. |
 | Sidebar warns "sqlglot is not installed" | Run `pip install sqlglot` inside the activated venv. |
 | Port already in use | `streamlit run app.py --server.port 8502` |
 | Want to start fresh | Delete the `.cache` folder (clears cached LLM answers and the schema index). |
