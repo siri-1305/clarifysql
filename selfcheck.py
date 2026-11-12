@@ -1,5 +1,5 @@
 """Quick health check. Run:  python selfcheck.py            (no API key needed)
-                              python selfcheck.py --online   (also tests the Gemini API)
+                              python selfcheck.py --online   (also tests the Groq API)
 """
 import json
 import sys
@@ -17,7 +17,7 @@ def report(ok, msg):
 
 
 print("1. Packages")
-for mod in ("streamlit", "google.genai", "sqlglot", "numpy", "pandas", "dotenv"):
+for mod in ("streamlit", "groq", "sqlglot", "numpy", "pandas", "dotenv"):
     try:
         m = __import__(mod, fromlist=["x"])
         report(True, f"{mod} {getattr(m, '__version__', '')}")
@@ -77,17 +77,13 @@ r = unittest.TextTestRunner(verbosity=0, stream=open("/dev/null" if sys.platform
 report(r.wasSuccessful(), f"{r.testsRun} tests, {len(r.failures)} failures, {len(r.errors)} errors")
 
 if "--online" in sys.argv:
-    print("6. Gemini API")
-    from clarifysql.llm import GeminiLLM, LLMError          # noqa: E402
+    print("6. Groq API")
+    from clarifysql.llm import GroqLLM, LLMError          # noqa: E402
     try:
-        llm = GeminiLLM(s)
+        llm = GroqLLM(s)
         out = llm.generate("Reply with the single word: ready", sample=999)
         report(True, f"chat model '{llm.model}' answered: {out[:40]!r}")
-        try:
-            v = llm.embed(["hello world"])
-            report(True, f"embedding model '{llm.embed_model_name}' works (dimension {v.shape[1]})")
-        except LLMError as e:
-            report(True, f"embeddings unavailable ({e}); the local fallback retriever will be used")
+        report(True, "Groq has no embedding models; schema retrieval uses the local embedder")
     except LLMError as e:
         report(False, str(e))
 
